@@ -219,22 +219,7 @@
             font-size: 10px;
         }
 
-        .grid-lines {
-            position: absolute;
-            left: 35px;
-            right: 0;
-            top: 0;
-            bottom: 30px;
-            pointer-events: none;
-        }
 
-        .grid-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.05);
-        }
 
         @media (max-width: 600px) {
             .widget {
@@ -264,7 +249,7 @@
                 <!-- Labels removed as height is now binary -->
             </div>
 
-            <div class="grid-lines" id="gridLines"></div>
+
 
             <div class="bars-container" id="barsContainer"></div>
         </div>
@@ -312,15 +297,7 @@
 
         function initChart() {
             const container = document.getElementById('barsContainer');
-            const gridLines = document.getElementById('gridLines');
 
-            // Create grid lines
-            for (let i = 0; i <= 4; i++) {
-                const line = document.createElement('div');
-                line.className = 'grid-line';
-                line.style.top = `${(i / 4) * 100}%`;
-                gridLines.appendChild(line);
-            }
 
             // Create bars for each activity
             schedule.forEach((activity, index) => {
