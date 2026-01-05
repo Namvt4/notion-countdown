@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Day - Hoạt động hiện tại</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            padding: 20px;
+        }
+
+        .widget {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-width: 280px;
+        }
+
+        .widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #06b6d4, #3b82f6);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+
+        .activity-name {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .time-range {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .countdown-unit {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 100%;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+            background: linear-gradient(90deg, #06b6d4, #3b82f6);
+        }
+
+        .next-activity {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 10px;
+        }
+
+        .next-activity span {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .widget {
+                padding: 24px 28px;
+                min-width: 240px;
+            }
+
+            .countdown {
+                font-size: 40px;
+            }
+
+            .activity-name {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="widget">
+        <div class="icon" id="activityIcon">💼</div>
+        <div class="label">Hoạt động hiện tại</div>
+        <div class="activity-name" id="activityName">Deep Working</div>
+        <div class="time-range" id="timeRange">10:00 - 12:00</div>
+        <div class="countdown" id="countdown">01:45</div>
+        <div class="countdown-unit">giờ : phút còn lại</div>
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>Tiến độ</span>
+                <span id="progressPercent">50%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 50%"></div>
+            </div>
+        </div>
+        <div class="next-activity" id="nextActivity">
+            Tiếp theo: <span>Relax Time</span>
+        </div>
+    </div>
+
+    <script>
+        const schedule = [
+            { name: "Review and Planning", icon: "📋", start: 8, end: 8.5 },
+            { name: "Team Communication", icon: "👥", start: 8.5, end: 9 },
+            { name: "Business Communication", icon: "💼", start: 9, end: 10 },
+            { name: "Deep Working", icon: "🎯", start: 10, end: 12 },
+            { name: "Relax Time", icon: "☕", start: 12, end: 13 },
+            { name: "Shallow Working", icon: "📝", start: 13, end: 15 },
+            { name: "Deep Working", icon: "🎯", start: 15, end: 17 },
+            { name: "Business Communication", icon: "💼", start: 17, end: 17.5 },
+            { name: "Team Communication", icon: "👥", start: 17.5, end: 18 },
+            { name: "Reflection Time", icon: "🧘", start: 18, end: 18.5 },
+            { name: "Family Time", icon: "❤️", start: 18.5, end: 24 },
+            { name: "Rest Time", icon: "🌙", start: 0, end: 8 }
+        ];
+
+        function formatTime(decimalHour) {
+            const hours = Math.floor(decimalHour);
+            const minutes = Math.round((decimalHour - hours) * 60);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        }
+
+        function getCurrentDecimalTime() {
+            const now = new Date();
+            return now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+        }
+
+        function getCurrentActivity(currentTime) {
+            for (let i = 0; i < schedule.length; i++) {
+                const activity = schedule[i];
+                if (currentTime >= activity.start && currentTime < activity.end) {
+                    return { current: activity, index: i };
+                }
+            }
+            // Default to Rest Time if outside schedule
+            return { current: schedule[schedule.length - 1], index: schedule.length - 1 };
+        }
+
+        function updateWidget() {
+            const currentTime = getCurrentDecimalTime();
+            const { current, index } = getCurrentActivity(currentTime);
+
+            // Get next activity
+            let nextIndex = (index + 1) % schedule.length;
+            // Skip Rest Time in next activity display during work hours
+            if (schedule[nextIndex].name === "Rest Time" && currentTime >= 8) {
+                nextIndex = 0;
+            }
+            const next = schedule[nextIndex];
+
+            // Calculate time remaining
+            let timeRemaining = current.end - currentTime;
+            if (timeRemaining < 0) timeRemaining = 0;
+
+            const hoursLeft = Math.floor(timeRemaining);
+            const minutesLeft = Math.floor((timeRemaining - hoursLeft) * 60);
+
+            // Calculate progress
+            const totalDuration = current.end - current.start;
+            const elapsed = currentTime - current.start;
+            const progressPercent = Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100)));
+
+            // Update DOM
+            document.getElementById('activityIcon').textContent = current.icon;
+            document.getElementById('activityName').textContent = current.name;
+            document.getElementById('timeRange').textContent = `${formatTime(current.start)} - ${formatTime(current.end)}`;
+            document.getElementById('countdown').textContent = `${String(hoursLeft).padStart(2, '0')}:${String(minutesLeft).padStart(2, '0')}`;
+            document.getElementById('progressPercent').textContent = `${progressPercent}%`;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            document.getElementById('nextActivity').innerHTML = `Tiếp theo: <span>${next.icon} ${next.name}</span>`;
+        }
+
+        // Initial update
+        updateWidget();
+
+        // Update every second
+        setInterval(updateWidget, 1000);
+    </script>
+</body>
+
+</html>
