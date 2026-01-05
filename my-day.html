@@ -335,11 +335,9 @@
                 bar.className = 'bar';
                 bar.id = `bar-${index}`;
 
-                // Calculate bar height based on duration
-                // Max height 6 hours for better visibility
-                const duration = activity.end - activity.start;
-                const maxScale = 6;
-                const heightPercent = Math.min((duration / maxScale) * 100, 100);
+                // Base height for all bars (inactive state = "value 0" visualization)
+                // We use a small percentage to keep labels aligned and bars visible as "track"
+                const heightPercent = 15;
                 bar.style.height = `${heightPercent}%`;
 
                 const label = document.createElement('div');
@@ -361,6 +359,8 @@
 
                 if (currentTime >= activity.start && currentTime < activity.end) {
                     bar.classList.add('active');
+                    // Active state = "value 10" visualization (full height)
+                    bar.style.height = '100%';
 
                     // Update current info
                     document.getElementById('currentIcon').textContent = activity.icon;
@@ -376,6 +376,11 @@
 
                 } else if (currentTime >= activity.end) {
                     bar.classList.add('passed');
+                    // Passed state remains low
+                    bar.style.height = '15%';
+                } else {
+                    // Future state remains low
+                    bar.style.height = '15%';
                 }
             });
         }
