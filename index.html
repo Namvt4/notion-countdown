@@ -70,6 +70,10 @@
             background: linear-gradient(90deg, #f7971e, #ffd200);
         }
 
+        .countdown-card.day::before {
+            background: linear-gradient(90deg, #a855f7, #6366f1);
+        }
+
         .icon {
             font-size: 38px;
             margin-bottom: 12px;
@@ -123,6 +127,13 @@
             background-clip: text;
         }
 
+        .countdown-card.day .number {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         .unit {
             color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
@@ -165,6 +176,10 @@
 
         .countdown-card.life .progress-fill {
             background: linear-gradient(90deg, #f7971e, #ffd200);
+        }
+
+        .countdown-card.day .progress-fill {
+            background: linear-gradient(90deg, #a855f7, #6366f1);
         }
 
         .date-info {
@@ -279,6 +294,25 @@
             </div>
             <div class="date-info" id="lifeInfo">29 tuổi / 90 tuổi</div>
         </div>
+
+        <!-- Day Countdown -->
+        <div class="countdown-card day">
+            <div class="icon">🌙</div>
+            <div class="label">Còn lại trong</div>
+            <div class="title" id="dayName">Hôm nay</div>
+            <div class="number" id="timeInDay">07:40</div>
+            <div class="unit">giờ : phút</div>
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Đã qua</span>
+                    <span id="dayPercent">68%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="dayProgress" style="width: 68%"></div>
+                </div>
+            </div>
+            <div class="date-info" id="dayInfo">16:20 / 24:00</div>
+        </div>
     </div>
 
     <script>
@@ -357,13 +391,31 @@
             document.getElementById('lifePercent').textContent = `${lifePercent}%`;
             document.getElementById('lifeProgress').style.width = `${lifePercent}%`;
             document.getElementById('lifeInfo').textContent = `${currentAge} tuổi / ${TARGET_AGE} tuổi`;
+
+            // Day calculations
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const totalSecondsInDay = 24 * 60 * 60;
+            const secondsPassed = hours * 3600 + minutes * 60 + seconds;
+            const secondsLeft = totalSecondsInDay - secondsPassed;
+            const hoursLeft = Math.floor(secondsLeft / 3600);
+            const minutesLeft = Math.floor((secondsLeft % 3600) / 60);
+            const dayPercent = Math.round((secondsPassed / totalSecondsInDay) * 100);
+
+            // Update Day Card
+            document.getElementById('dayName').textContent = `Hôm nay`;
+            document.getElementById('timeInDay').textContent = `${String(hoursLeft).padStart(2, '0')}:${String(minutesLeft).padStart(2, '0')}`;
+            document.getElementById('dayPercent').textContent = `${dayPercent}%`;
+            document.getElementById('dayProgress').style.width = `${dayPercent}%`;
+            document.getElementById('dayInfo').textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} / 24:00`;
         }
 
         // Initial update
         updateCountdown();
 
-        // Update every minute
-        setInterval(updateCountdown, 60000);
+        // Update every second for day countdown
+        setInterval(updateCountdown, 1000);
 
         // Check if embedded in Notion (via URL parameter)
         const urlParams = new URLSearchParams(window.location.search);
