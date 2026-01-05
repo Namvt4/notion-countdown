@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@1,300;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            padding: 20px;
+        }
+
+        .quote-card {
+            background-color: #2F3E34;
+            /* Dark green/Forest green */
+            color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            /* No border radius or specific border radius based on image, keeping it somewhat rectangular/flat or slight rounded */
+            border-radius: 4px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .stripe {
+            width: 8px;
+            background-color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .content {
+            padding: 32px 40px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .edit-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .edit-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .quote-text {
+            font-family: 'Merriweather', serif;
+            font-size: 24px;
+            font-style: italic;
+            line-height: 1.5;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .quote-author {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0.8;
+            text-align: right;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 16px;
+            display: inline-block;
+            align-self: flex-end;
+            width: 100%;
+        }
+
+        /* Custom Input Form */
+        .custom-form {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .custom-form input,
+        .custom-form textarea {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .custom-form textarea {
+            font-family: 'Merriweather', serif;
+            font-style: italic;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+        }
+
+        .bg-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .primary-btn {
+            background: white;
+            color: #2F3E34;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .content {
+                padding: 24px;
+            }
+
+            .quote-text {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="quote-card">
+        <div class="stripe"></div>
+        <div class="content">
+            <div class="header">
+                <span id="headerTitle">Daily Quote</span>
+                <button class="edit-btn" onclick="toggleEdit()">Edit</button>
+            </div>
+
+            <div id="displayArea">
+                <div class="quote-text" id="quoteText">"The best way to predict the future is to create it."</div>
+                <div class="quote-author" id="quoteAuthor">- Peter Drucker</div>
+            </div>
+
+            <div id="editArea" class="custom-form">
+                <textarea id="customQuoteInput" placeholder="Enter your custom quote..."></textarea>
+                <input type="text" id="customAuthorInput" placeholder="Author (optional)">
+                <div class="form-actions">
+                    <button class="action-btn bg-btn" onclick="resetToDaily()">Reset to Daily</button>
+                    <button class="action-btn primary-btn" onclick="saveCustom()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+            { text: "Success is not final, failure is not fatal: It is the courage to continue that counts.", author: "Winston Churchill" },
+            { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+            { text: "Everything you've ever wanted is on the other side of fear.", author: "George Addair" },
+            { text: "Opportunities don't happen. You create them.", author: "Chris Grosser" },
+            { text: "Hardships often prepare ordinary people for an extraordinary destiny.", author: "C.S. Lewis" },
+            { text: "Dream big and dare to fail.", author: "Norman Vaughan" },
+            { text: "Your time is limited, so don't waste it living someone else's life.", author: "Steve Jobs" },
+            { text: "If you want to achieve greatness stop asking for permission.", author: "Anonymous" },
+            { text: "Small steps in the right direction can turn out to be the biggest step of your life.", author: "Anonymous" },
+            { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+            { text: "Success usually comes to those who are too busy to be looking for it.", author: "Henry David Thoreau" },
+            { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
+            { text: "If not us, who? If not now, when?", author: "John F. Kennedy" },
+            { text: "Everything has beauty, but not everyone can see.", author: "Confucius" },
+            { text: "Change your thoughts and you change your world.", author: "Norman Vincent Peale" },
+            { text: "It is never too late to be what you might have been.", author: "George Eliot" },
+            { text: "A journey of a thousand miles begins with a single step.", author: "Lao Tzu" },
+            { text: "What we think, we become.", author: "Buddha" },
+            { text: "Act as if what you do makes a difference. It does.", author: "William James" },
+            { text: "Success is how high you bounce when you hit bottom.", author: "George S. Patton" },
+            { text: "You must do the thing you think you cannot do.", author: "Eleanor Roosevelt" },
+            { text: "Don't wait. The time will never be just right.", author: "Napoleon Hill" },
+            { text: "Tough times never last, but tough people do.", author: "Robert H. Schuller" },
+            { text: "The best revenge is massive success.", author: "Frank Sinatra" },
+            { text: "Life is what happens when you're busy making other plans.", author: "John Lennon" },
+            { text: "Get busy living or get busy dying.", author: "Stephen King" },
+            { text: "You only live once, but if you do it right, once is enough.", author: "Mae West" },
+            { text: "To live is the rarest thing in the world. Most people exist, that is all.", author: "Oscar Wilde" },
+            { text: "That which does not kill us makes us stronger.", author: "Friedrich Nietzsche" },
+            { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
+            { text: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein" },
+            { text: "We become what we think about.", author: "Earl Nightingale" },
+            { text: "The mind is everything. What you think you become.", author: "Buddha" },
+            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+            { text: "Your limit is you.", author: "Anonymous" },
+            { text: "Don't stop until you're proud.", author: "Anonymous" },
+            { text: "Everything is hard before it is easy.", author: "Goethe" },
+            { text: "Dream it. Wish it. Do it.", author: "Anonymous" },
+            { text: "Stay hungry, stay foolish.", author: "Steve Jobs" },
+            { text: "Done is better than perfect.", author: "Sheryl Sandberg" },
+            { text: "Action is the foundational key to all success.", author: "Pablo Picasso" },
+            { text: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
+            { text: "Be the change that you wish to see in the world.", author: "Mahatma Gandhi" },
+            { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
+            { text: "Happiness depends upon ourselves.", author: "Aristotle" },
+            { text: "Turn your wounds into wisdom.", author: "Oprah Winfrey" },
+            { text: "Do one thing every day that scares you.", author: "Eleanor Roosevelt" }
+        ];
+
+        function getDailyQuote() {
+            // Check if there's a custom quote saved
+            const customQuote = localStorage.getItem('custom_quote');
+            if (customQuote) {
+                return JSON.parse(customQuote);
+            }
+
+            // Otherwise get standard daily quote based on date
+            const today = new Date();
+            // Create a unique hash for the day (e.g., 20231027)
+            const dateHash = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+            // Use hash to pick index
+            const index = dateHash % quotes.length;
+            return {
+                ...quotes[index],
+                isCustom: false
+            };
+        }
+
+        function renderQuote() {
+            const data = getDailyQuote();
+            document.getElementById('quoteText').textContent = `"${data.text}"`;
+            document.getElementById('quoteAuthor').textContent = `- ${data.author || 'Anonymous'}`;
+
+            // Validate if it is custom or daily
+            if (data.isCustom) {
+                document.getElementById('headerTitle').textContent = 'My Quote';
+            } else {
+                document.getElementById('headerTitle').textContent = 'Quote Today';
+            }
+        }
+
+        function toggleEdit() {
+            const displayArea = document.getElementById('displayArea');
+            const editArea = document.getElementById('editArea');
+            const isEditing = displayArea.style.display === 'none';
+
+            if (isEditing) {
+                // Cancel edit
+                displayArea.style.display = 'block';
+                editArea.style.display = 'none';
+            } else {
+                // Start edit
+                // Pre-fill with current text ONLY if it's already a custom quote? 
+                // Or let them type fresh? Let's check local storage
+                const saved = localStorage.getItem('custom_quote');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    document.getElementById('customQuoteInput').value = parsed.text;
+                    document.getElementById('customAuthorInput').value = parsed.author;
+                } else {
+                    document.getElementById('customQuoteInput').value = "";
+                    document.getElementById('customAuthorInput').value = "";
+                }
+
+                displayArea.style.display = 'none';
+                editArea.style.display = 'flex';
+                document.getElementById('customQuoteInput').focus();
+            }
+        }
+
+        function saveCustom() {
+            const text = document.getElementById('customQuoteInput').value.trim();
+            const author = document.getElementById('customAuthorInput').value.trim();
+
+            if (!text) {
+                alert("Please enter a quote text.");
+                return;
+            }
+
+            const quoteObj = {
+                text: text,
+                author: author,
+                isCustom: true
+            };
+
+            localStorage.setItem('custom_quote', JSON.stringify(quoteObj));
+
+            // Switch back to display
+            document.getElementById('displayArea').style.display = 'block';
+            document.getElementById('editArea').style.display = 'none';
+            renderQuote();
+        }
+
+        function resetToDaily() {
+            localStorage.removeItem('custom_quote');
+            document.getElementById('displayArea').style.display = 'block';
+            document.getElementById('editArea').style.display = 'none';
+            renderQuote();
+        }
+
+        // Initialize
+        renderQuote();
+    </script>
+</body>
+
+</html>
