@@ -31,6 +31,7 @@
             padding: 24px;
             width: 100%;
             max-width: 800px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
         .header {
@@ -91,36 +92,58 @@
         }
 
         .bar {
-            width: 100%;
-            max-width: 50px;
-            background: rgba(100, 100, 120, 0.5);
+            width: 80%;
+            max-width: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: none;
             border-radius: 4px 4px 0 0;
             position: absolute;
             bottom: 30px;
-            transition: all 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .bar.active {
             background: linear-gradient(180deg, #06b6d4, #3b82f6);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+            border: none;
+            z-index: 10;
+            animation: pulse-bar 2s infinite;
         }
 
         .bar.passed {
-            background: rgba(80, 80, 100, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            opacity: 0.5;
+        }
+
+        @keyframes pulse-bar {
+            0% {
+                box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+            }
         }
 
         .bar-label {
             position: absolute;
-            bottom: 0;
-            font-size: 8px;
+            bottom: -5px;
+            font-size: 9px;
             color: rgba(255, 255, 255, 0.5);
-            text-align: center;
-            width: 100%;
+            text-align: right;
+            width: 100px;
             transform: rotate(-45deg);
-            transform-origin: top left;
+            transform-origin: right top;
+            right: 50%;
             white-space: nowrap;
-            left: 50%;
-            padding-top: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 5px;
         }
 
         .bar.active .bar-label {
@@ -128,24 +151,23 @@
             font-weight: 600;
         }
 
-        .current-time-line {
+        .y-axis {
             position: absolute;
-            left: 35px;
-            right: 0;
-            height: 2px;
-            background: #06b6d4;
-            z-index: 10;
+            left: 0;
+            top: 0;
+            bottom: 30px;
+            width: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 10px;
         }
 
-        .current-time-line::before {
-            content: '';
-            position: absolute;
-            left: -4px;
-            top: -3px;
-            width: 8px;
-            height: 8px;
-            background: #06b6d4;
-            border-radius: 50%;
+        .y-axis span::after {
+            content: 'h';
+            font-size: 8px;
+            opacity: 0.7;
         }
 
         .current-info {
@@ -239,18 +261,16 @@
 
         <div class="chart-container">
             <div class="y-axis">
-                <span>12</span>
-                <span>9</span>
                 <span>6</span>
+                <span>4.5</span>
                 <span>3</span>
+                <span>1.5</span>
                 <span>0</span>
             </div>
 
             <div class="grid-lines" id="gridLines"></div>
 
             <div class="bars-container" id="barsContainer"></div>
-
-            <div class="current-time-line" id="currentTimeLine"></div>
         </div>
 
         <div class="current-info">
@@ -315,14 +335,16 @@
                 bar.className = 'bar';
                 bar.id = `bar-${index}`;
 
-                // Calculate bar height based on duration (max 12 hours = 100%)
+                // Calculate bar height based on duration
+                // Max height 6 hours for better visibility
                 const duration = activity.end - activity.start;
-                const heightPercent = (duration / 12) * 100;
+                const maxScale = 6;
+                const heightPercent = Math.min((duration / maxScale) * 100, 100);
                 bar.style.height = `${heightPercent}%`;
 
                 const label = document.createElement('div');
                 label.className = 'bar-label';
-                label.textContent = activity.name.length > 15 ? activity.name.substring(0, 12) + '...' : activity.name;
+                label.textContent = activity.name;
                 bar.appendChild(label);
 
                 wrapper.appendChild(bar);
@@ -349,18 +371,13 @@
                     let remaining = activity.end - currentTime;
                     const hoursLeft = Math.floor(remaining);
                     const minutesLeft = Math.floor((remaining - hoursLeft) * 60);
-                    document.getElementById('remainingTime').textContent = `${String(hoursLeft).padStart(2, '0')}:${String(minutesLeft).padStart(2, '0')}`;
+                    const secondsLeftVal = Math.floor((remaining * 3600) % 60);
+                    document.getElementById('remainingTime').textContent = `${String(hoursLeft).padStart(2, '0')}:${String(minutesLeft).padStart(2, '0')}:${String(secondsLeftVal).padStart(2, '0')}`;
 
                 } else if (currentTime >= activity.end) {
                     bar.classList.add('passed');
                 }
             });
-
-            // Update current time line position
-            const chartHeight = document.querySelector('.chart-container').offsetHeight - 30;
-            const timeInWorkday = Math.max(0, Math.min(currentTime - 8, 16));
-            const linePosition = chartHeight - (timeInWorkday / 16) * chartHeight;
-            document.getElementById('currentTimeLine').style.top = `${linePosition}px`;
         }
 
         // Initialize
