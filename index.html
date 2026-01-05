@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown - Ngày còn lại</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .countdown-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .countdown-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .countdown-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .countdown-card.month::before {
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+        }
+
+        .countdown-card.year::before {
+            background: linear-gradient(90deg, #fc466b, #3f5efb);
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .number {
+            font-size: 80px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .countdown-card.month .number {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .countdown-card.year .number {
+            background: linear-gradient(135deg, #fc466b, #3f5efb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .unit {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .progress-container {
+            margin-top: 25px;
+            width: 100%;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .countdown-card.month .progress-fill {
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+        }
+
+        .countdown-card.year .progress-fill {
+            background: linear-gradient(90deg, #fc466b, #3f5efb);
+        }
+
+        .date-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .countdown-card {
+                padding: 30px 35px;
+            }
+
+            .number {
+                font-size: 60px;
+            }
+
+            .icon {
+                font-size: 36px;
+            }
+        }
+
+        /* For Notion embed - transparent background option */
+        body.notion-embed {
+            background: transparent;
+            min-height: auto;
+            padding: 10px;
+        }
+
+        body.notion-embed .countdown-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.notion-embed .label,
+        body.notion-embed .unit,
+        body.notion-embed .date-info {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        body.notion-embed .title {
+            color: #1a1a2e;
+        }
+
+        body.notion-embed .progress-bar {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        body.notion-embed .progress-label {
+            color: rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Month Countdown -->
+        <div class="countdown-card month">
+            <div class="icon">📅</div>
+            <div class="label">Còn lại trong</div>
+            <div class="title" id="monthName">Tháng 1, 2026</div>
+            <div class="number" id="daysInMonth">26</div>
+            <div class="unit">ngày</div>
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Đã qua</span>
+                    <span id="monthPercent">16%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="monthProgress" style="width: 16%"></div>
+                </div>
+            </div>
+            <div class="date-info" id="monthInfo">Ngày 5 / 31 ngày</div>
+        </div>
+
+        <!-- Year Countdown -->
+        <div class="countdown-card year">
+            <div class="icon">🎯</div>
+            <div class="label">Còn lại trong</div>
+            <div class="title" id="yearName">Năm 2026</div>
+            <div class="number" id="daysInYear">360</div>
+            <div class="unit">ngày</div>
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Đã qua</span>
+                    <span id="yearPercent">1%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="yearProgress" style="width: 1%"></div>
+                </div>
+            </div>
+            <div class="date-info" id="yearInfo">Ngày 5 / 365 ngày</div>
+        </div>
+    </div>
+
+    <script>
+        const vietnameseMonths = [
+            'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
+            'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
+            'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+        ];
+
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        }
+
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function getDaysInYear(year) {
+            return isLeapYear(year) ? 366 : 365;
+        }
+
+        function getDayOfYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.floor(diff / oneDay);
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const day = now.getDate();
+
+            // Month calculations
+            const daysInMonth = getDaysInMonth(year, month);
+            const daysLeftInMonth = daysInMonth - day;
+            const monthPercent = Math.round((day / daysInMonth) * 100);
+
+            // Year calculations
+            const daysInYear = getDaysInYear(year);
+            const dayOfYear = getDayOfYear(now);
+            const daysLeftInYear = daysInYear - dayOfYear;
+            const yearPercent = Math.round((dayOfYear / daysInYear) * 100);
+
+            // Update Month Card
+            document.getElementById('monthName').textContent = `${vietnameseMonths[month]}, ${year}`;
+            document.getElementById('daysInMonth').textContent = daysLeftInMonth;
+            document.getElementById('monthPercent').textContent = `${monthPercent}%`;
+            document.getElementById('monthProgress').style.width = `${monthPercent}%`;
+            document.getElementById('monthInfo').textContent = `Ngày ${day} / ${daysInMonth} ngày`;
+
+            // Update Year Card
+            document.getElementById('yearName').textContent = `Năm ${year}`;
+            document.getElementById('daysInYear').textContent = daysLeftInYear;
+            document.getElementById('yearPercent').textContent = `${yearPercent}%`;
+            document.getElementById('yearProgress').style.width = `${yearPercent}%`;
+            document.getElementById('yearInfo').textContent = `Ngày ${dayOfYear} / ${daysInYear} ngày`;
+        }
+
+        // Initial update
+        updateCountdown();
+
+        // Update every minute
+        setInterval(updateCountdown, 60000);
+
+        // Check if embedded in Notion (via URL parameter)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('theme') === 'light') {
+            document.body.classList.add('notion-embed');
+        }
+    </script>
+</body>
+</html>
