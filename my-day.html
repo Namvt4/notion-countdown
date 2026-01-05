@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Day - Hoạt động hiện tại</title>
+    <title>My Day - Timeline</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -24,123 +24,207 @@
         }
 
         .widget {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(30, 30, 40, 0.95);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 32px 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            min-width: 280px;
-        }
-
-        .widget::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #06b6d4, #3b82f6);
-            border-radius: 20px 20px 0 0;
-        }
-
-        .icon {
-            font-size: 42px;
-            margin-bottom: 12px;
-        }
-
-        .label {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 10px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 8px;
-        }
-
-        .activity-name {
-            color: #fff;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .time-range {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            margin-bottom: 20px;
-        }
-
-        .countdown {
-            font-size: 48px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1;
-            margin-bottom: 6px;
-        }
-
-        .countdown-unit {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-            margin-bottom: 20px;
-        }
-
-        .progress-container {
+            border-radius: 16px;
+            padding: 24px;
             width: 100%;
+            max-width: 800px;
         }
 
-        .progress-label {
+        .header {
             display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .header-icon {
+            font-size: 20px;
+        }
+
+        .header-title {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-bottom: 10px;
+        }
+
+        .y-axis {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 30px;
+            width: 30px;
+            display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 10px;
-            margin-bottom: 6px;
-        }
-
-        .progress-bar {
-            height: 5px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 8px;
-            transition: width 0.5s ease;
-            background: linear-gradient(90deg, #06b6d4, #3b82f6);
-        }
-
-        .next-activity {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.4);
             font-size: 10px;
         }
 
-        .next-activity span {
-            color: rgba(255, 255, 255, 0.7);
+        .bars-container {
+            position: absolute;
+            left: 35px;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding-bottom: 30px;
+        }
+
+        .bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            position: relative;
+        }
+
+        .bar {
+            width: 100%;
+            max-width: 50px;
+            background: rgba(100, 100, 120, 0.5);
+            border-radius: 4px 4px 0 0;
+            position: absolute;
+            bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .bar.active {
+            background: linear-gradient(180deg, #06b6d4, #3b82f6);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .bar.passed {
+            background: rgba(80, 80, 100, 0.4);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: 0;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            width: 100%;
+            transform: rotate(-45deg);
+            transform-origin: top left;
+            white-space: nowrap;
+            left: 50%;
+            padding-top: 8px;
+        }
+
+        .bar.active .bar-label {
+            color: #06b6d4;
             font-weight: 600;
+        }
+
+        .current-time-line {
+            position: absolute;
+            left: 35px;
+            right: 0;
+            height: 2px;
+            background: #06b6d4;
+            z-index: 10;
+        }
+
+        .current-time-line::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: -3px;
+            width: 8px;
+            height: 8px;
+            background: #06b6d4;
+            border-radius: 50%;
+        }
+
+        .current-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-activity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-icon {
+            font-size: 24px;
+        }
+
+        .activity-details {
+            text-align: left;
+        }
+
+        .activity-name {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .activity-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+        }
+
+        .time-remaining {
+            text-align: right;
+        }
+
+        .remaining-value {
+            color: #06b6d4;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .remaining-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+        }
+
+        .grid-lines {
+            position: absolute;
+            left: 35px;
+            right: 0;
+            top: 0;
+            bottom: 30px;
+            pointer-events: none;
+        }
+
+        .grid-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         @media (max-width: 600px) {
             .widget {
-                padding: 24px 28px;
-                min-width: 240px;
+                padding: 16px;
             }
 
-            .countdown {
-                font-size: 40px;
+            .bar-label {
+                font-size: 6px;
             }
 
-            .activity-name {
-                font-size: 18px;
+            .chart-container {
+                height: 160px;
             }
         }
     </style>
@@ -148,23 +232,39 @@
 
 <body>
     <div class="widget">
-        <div class="icon" id="activityIcon">💼</div>
-        <div class="label">Hoạt động hiện tại</div>
-        <div class="activity-name" id="activityName">Deep Working</div>
-        <div class="time-range" id="timeRange">10:00 - 12:00</div>
-        <div class="countdown" id="countdown">01:45</div>
-        <div class="countdown-unit">giờ : phút còn lại</div>
-        <div class="progress-container">
-            <div class="progress-label">
-                <span>Tiến độ</span>
-                <span id="progressPercent">50%</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 50%"></div>
-            </div>
+        <div class="header">
+            <span class="header-icon">📊</span>
+            <span class="header-title">My day</span>
         </div>
-        <div class="next-activity" id="nextActivity">
-            Tiếp theo: <span>Relax Time</span>
+
+        <div class="chart-container">
+            <div class="y-axis">
+                <span>12</span>
+                <span>9</span>
+                <span>6</span>
+                <span>3</span>
+                <span>0</span>
+            </div>
+
+            <div class="grid-lines" id="gridLines"></div>
+
+            <div class="bars-container" id="barsContainer"></div>
+
+            <div class="current-time-line" id="currentTimeLine"></div>
+        </div>
+
+        <div class="current-info">
+            <div class="current-activity">
+                <span class="activity-icon" id="currentIcon">🎯</span>
+                <div class="activity-details">
+                    <div class="activity-name" id="currentName">Deep Working</div>
+                    <div class="activity-time" id="currentTime">10:00 - 12:00</div>
+                </div>
+            </div>
+            <div class="time-remaining">
+                <div class="remaining-value" id="remainingTime">01:45</div>
+                <div class="remaining-label">còn lại</div>
+            </div>
         </div>
     </div>
 
@@ -180,8 +280,7 @@
             { name: "Business Communication", icon: "💼", start: 17, end: 17.5 },
             { name: "Team Communication", icon: "👥", start: 17.5, end: 18 },
             { name: "Reflection Time", icon: "🧘", start: 18, end: 18.5 },
-            { name: "Family Time", icon: "❤️", start: 18.5, end: 24 },
-            { name: "Rest Time", icon: "🌙", start: 0, end: 8 }
+            { name: "Family Time", icon: "❤️", start: 18.5, end: 24 }
         ];
 
         function formatTime(decimalHour) {
@@ -195,56 +294,81 @@
             return now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
         }
 
-        function getCurrentActivity(currentTime) {
-            for (let i = 0; i < schedule.length; i++) {
-                const activity = schedule[i];
-                if (currentTime >= activity.start && currentTime < activity.end) {
-                    return { current: activity, index: i };
-                }
+        function initChart() {
+            const container = document.getElementById('barsContainer');
+            const gridLines = document.getElementById('gridLines');
+
+            // Create grid lines
+            for (let i = 0; i <= 4; i++) {
+                const line = document.createElement('div');
+                line.className = 'grid-line';
+                line.style.top = `${(i / 4) * 100}%`;
+                gridLines.appendChild(line);
             }
-            // Default to Rest Time if outside schedule
-            return { current: schedule[schedule.length - 1], index: schedule.length - 1 };
+
+            // Create bars for each activity
+            schedule.forEach((activity, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'bar-wrapper';
+
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.id = `bar-${index}`;
+
+                // Calculate bar height based on duration (max 12 hours = 100%)
+                const duration = activity.end - activity.start;
+                const heightPercent = (duration / 12) * 100;
+                bar.style.height = `${heightPercent}%`;
+
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = activity.name.length > 15 ? activity.name.substring(0, 12) + '...' : activity.name;
+                bar.appendChild(label);
+
+                wrapper.appendChild(bar);
+                container.appendChild(wrapper);
+            });
         }
 
-        function updateWidget() {
+        function updateChart() {
             const currentTime = getCurrentDecimalTime();
-            const { current, index } = getCurrentActivity(currentTime);
 
-            // Get next activity
-            let nextIndex = (index + 1) % schedule.length;
-            // Skip Rest Time in next activity display during work hours
-            if (schedule[nextIndex].name === "Rest Time" && currentTime >= 8) {
-                nextIndex = 0;
-            }
-            const next = schedule[nextIndex];
+            schedule.forEach((activity, index) => {
+                const bar = document.getElementById(`bar-${index}`);
+                bar.classList.remove('active', 'passed');
 
-            // Calculate time remaining
-            let timeRemaining = current.end - currentTime;
-            if (timeRemaining < 0) timeRemaining = 0;
+                if (currentTime >= activity.start && currentTime < activity.end) {
+                    bar.classList.add('active');
 
-            const hoursLeft = Math.floor(timeRemaining);
-            const minutesLeft = Math.floor((timeRemaining - hoursLeft) * 60);
+                    // Update current info
+                    document.getElementById('currentIcon').textContent = activity.icon;
+                    document.getElementById('currentName').textContent = activity.name;
+                    document.getElementById('currentTime').textContent = `${formatTime(activity.start)} - ${formatTime(activity.end)}`;
 
-            // Calculate progress
-            const totalDuration = current.end - current.start;
-            const elapsed = currentTime - current.start;
-            const progressPercent = Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100)));
+                    // Calculate remaining time
+                    let remaining = activity.end - currentTime;
+                    const hoursLeft = Math.floor(remaining);
+                    const minutesLeft = Math.floor((remaining - hoursLeft) * 60);
+                    document.getElementById('remainingTime').textContent = `${String(hoursLeft).padStart(2, '0')}:${String(minutesLeft).padStart(2, '0')}`;
 
-            // Update DOM
-            document.getElementById('activityIcon').textContent = current.icon;
-            document.getElementById('activityName').textContent = current.name;
-            document.getElementById('timeRange').textContent = `${formatTime(current.start)} - ${formatTime(current.end)}`;
-            document.getElementById('countdown').textContent = `${String(hoursLeft).padStart(2, '0')}:${String(minutesLeft).padStart(2, '0')}`;
-            document.getElementById('progressPercent').textContent = `${progressPercent}%`;
-            document.getElementById('progressFill').style.width = `${progressPercent}%`;
-            document.getElementById('nextActivity').innerHTML = `Tiếp theo: <span>${next.icon} ${next.name}</span>`;
+                } else if (currentTime >= activity.end) {
+                    bar.classList.add('passed');
+                }
+            });
+
+            // Update current time line position
+            const chartHeight = document.querySelector('.chart-container').offsetHeight - 30;
+            const timeInWorkday = Math.max(0, Math.min(currentTime - 8, 16));
+            const linePosition = chartHeight - (timeInWorkday / 16) * chartHeight;
+            document.getElementById('currentTimeLine').style.top = `${linePosition}px`;
         }
 
-        // Initial update
-        updateWidget();
+        // Initialize
+        initChart();
+        updateChart();
 
         // Update every second
-        setInterval(updateWidget, 1000);
+        setInterval(updateChart, 1000);
     </script>
 </body>
 
