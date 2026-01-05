@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,6 +66,10 @@
             background: linear-gradient(90deg, #fc466b, #3f5efb);
         }
 
+        .countdown-card.life::before {
+            background: linear-gradient(90deg, #f7971e, #ffd200);
+        }
+
         .icon {
             font-size: 48px;
             margin-bottom: 15px;
@@ -89,7 +94,7 @@
         .number {
             font-size: 80px;
             font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -106,6 +111,13 @@
 
         .countdown-card.year .number {
             background: linear-gradient(135deg, #fc466b, #3f5efb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .countdown-card.life .number {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -149,6 +161,10 @@
 
         .countdown-card.year .progress-fill {
             background: linear-gradient(90deg, #fc466b, #3f5efb);
+        }
+
+        .countdown-card.life .progress-fill {
+            background: linear-gradient(90deg, #f7971e, #ffd200);
         }
 
         .date-info {
@@ -204,6 +220,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Month Countdown -->
@@ -243,6 +260,25 @@
             </div>
             <div class="date-info" id="yearInfo">Ngày 5 / 365 ngày</div>
         </div>
+
+        <!-- Life Countdown -->
+        <div class="countdown-card life">
+            <div class="icon">⏳</div>
+            <div class="label">Còn lại trong</div>
+            <div class="title" id="lifeName">Cuộc đời (90 tuổi)</div>
+            <div class="number" id="daysInLife">21,750</div>
+            <div class="unit">ngày</div>
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Đã sống</span>
+                    <span id="lifePercent">33%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="lifeProgress" style="width: 33%"></div>
+                </div>
+            </div>
+            <div class="date-info" id="lifeInfo">29 tuổi / 90 tuổi</div>
+        </div>
     </div>
 
     <script>
@@ -270,6 +306,12 @@
             const oneDay = 1000 * 60 * 60 * 24;
             return Math.floor(diff / oneDay);
         }
+
+        // Life countdown config
+        const BIRTH_DATE = new Date(1996, 6, 24); // July 24, 1996
+        const TARGET_AGE = 90;
+        const TARGET_DATE = new Date(BIRTH_DATE);
+        TARGET_DATE.setFullYear(TARGET_DATE.getFullYear() + TARGET_AGE);
 
         function updateCountdown() {
             const now = new Date();
@@ -301,6 +343,20 @@
             document.getElementById('yearPercent').textContent = `${yearPercent}%`;
             document.getElementById('yearProgress').style.width = `${yearPercent}%`;
             document.getElementById('yearInfo').textContent = `Ngày ${dayOfYear} / ${daysInYear} ngày`;
+
+            // Life calculations
+            const totalLifeDays = Math.floor((TARGET_DATE - BIRTH_DATE) / (1000 * 60 * 60 * 24));
+            const daysLived = Math.floor((now - BIRTH_DATE) / (1000 * 60 * 60 * 24));
+            const daysLeftInLife = totalLifeDays - daysLived;
+            const lifePercent = Math.round((daysLived / totalLifeDays) * 100);
+            const currentAge = Math.floor(daysLived / 365.25);
+
+            // Update Life Card
+            document.getElementById('lifeName').textContent = `Cuộc đời (${TARGET_AGE} tuổi)`;
+            document.getElementById('daysInLife').textContent = daysLeftInLife.toLocaleString();
+            document.getElementById('lifePercent').textContent = `${lifePercent}%`;
+            document.getElementById('lifeProgress').style.width = `${lifePercent}%`;
+            document.getElementById('lifeInfo').textContent = `${currentAge} tuổi / ${TARGET_AGE} tuổi`;
         }
 
         // Initial update
@@ -316,4 +372,5 @@
         }
     </script>
 </body>
+
 </html>
